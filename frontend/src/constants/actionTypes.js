@@ -1,0 +1,61 @@
+// Auth
+export const LOGIN_SUCCESS = 'LOGIN_SUCCESS';
+export const LOGOUT = 'LOGOUT';
+export const REGISTER_SUCCESS = 'REGISTER_SUCCESS';
+export const REFRESH_TOKEN_SUCCESS = 'REFRESH_TOKEN_SUCCESS';
+
+export const AUTH_ERROR = 'AUTH_ERROR';
+
+// Blogs
+// export const FETCH_BLOGS = 'FETCH_BLOGS';
+// export const CREATE_BLOG = 'CREATE_BLOG';
+// export const DELETE_BLOG = 'DELETE_BLOG';
+export const GET_ALL_BLOGS = 'GET_ALL_BLOGS';
+export const GET_BLOGS_BY_USER = 'GET_BLOGS_BY_USER';
+export const GET_BLOGS = 'GET_BLOGS';
+export const GET_SINGLE_BLOG = 'GET_SINGLE_BLOG';
+export const GET_BLOGS_BY_CATEGORY = 'GET_BLOGS_BY_CATEGORY';
+export const GET_BLOG_COMMENTS = 'GET_BLOG_COMMENTS';
+export const CREATE_BLOG = 'CREATE_BLOG';
+export const DELETE_BLOG = 'DELETE_BLOG';
+export const LIKE_DISLIKE_BLOG = 'LIKE_DISLIKE_BLOG';
+export const BLOG_ERROR = 'BLOG_ERROR';
+
+// Categories
+// export const FETCH_CATEGORIES = 'FETCH_CATEGORIES';
+export const GET_ALL_CATEGORIES = 'GET_ALL_CATEGORIES';
+export const GET_SINGLE_CATEGORY = 'GET_SINGLE_CATEGORY';
+export const CREATE_CATEGORY = 'CREATE_CATEGORY';
+export const DELETE_CATEGORY = 'DELETE_CATEGORY';
+export const CATEGORY_ERROR = 'CATEGORY_ERROR';
+
+// Comments
+// export const FETCH_COMMENTS = 'FETCH_COMMENTS';
+// export const ADD_COMMENT = 'ADD_COMMENT';
+export const ADD_COMMENT = 'ADD_COMMENT';
+export const EDIT_COMMENT = 'EDIT_COMMENT';
+export const DELETE_COMMENT = 'DELETE_COMMENT';
+export const REPLY_TO_COMMENT = 'REPLY_TO_COMMENT';
+export const LIKE_DISLIKE_COMMENT = 'LIKE_DISLIKE_COMMENT';
+export const GET_COMMENT_LIKES = 'GET_COMMENT_LIKES';
+export const GET_COMMENT_DISLIKES = 'GET_COMMENT_DISLIKES';
+export const COMMENT_ERROR = 'COMMENT_ERROR';
+
+// Users
+// export const FETCH_USERS = 'FETCH_USERS';
+// export const UPDATE_USER_ROLE = 'UPDATE_USER_ROLE';
+export const GET_PROFILE = 'GET_PROFILE';
+export const UPDATE_PROFILE_PICTURE = 'UPDATE_PROFILE_PICTURE';
+export const UPDATE_USERNAME = 'UPDATE_USERNAME';
+export const UPDATE_EMAIL = 'UPDATE_EMAIL';
+export const UPDATE_PASSWORD = 'UPDATE_PASSWORD';
+
+export const CREATE_USER = 'CREATE_USER';
+export const GET_ALL_USERS = 'GET_ALL_USERS';
+export const UPDATE_USER_ROLE = 'UPDATE_USER_ROLE';
+export const DELETE_USER = 'DELETE_USER';
+export const BLOCK_UNBLOCK_USER = 'BLOCK_UNBLOCK_USER';
+export const SAVE_BLOG = 'SAVE_BLOG';
+export const GET_SAVED_BLOGS = 'GET_SAVED_BLOGS';
+export const REMOVE_SAVED_BLOG = 'REMOVE_SAVED_BLOG';
+export const USER_ERROR = 'USER_ERROR';
