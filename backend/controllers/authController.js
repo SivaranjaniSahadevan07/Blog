@@ -80,7 +80,8 @@ exports.login = async (req, res) => {
     res.cookie('refreshToken', refreshToken, {
       httpOnly: true, // Prevents access by JavaScript
       secure: process.env.NODE_ENV === 'production', // Sends the cookie only over HTTPS
-      sameSite: 'Strict', // Protects against CSRF
+      // sameSite: 'Strict', // Protects against CSRF
+      sameSite: 'None', // allow cross-site cookie
       // maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
     });
     res.status(201).json({ accessToken, user: await User.findById(user._id).select("-password") }); // Send access token in the response
