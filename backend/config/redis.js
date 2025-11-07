@@ -6,7 +6,7 @@ const redisClient = redis.createClient({
     username: 'default',
     password: 'sRALrOaDUy5yBqDHVDzMLwXnSh7Klmod',
     socket: {
-        host: 'redis-17554.c277.us-east-1-3.ec2.redns.redis-cloud.com',
+        host: 'redis-17554.c262.us-east-1-3.ec2.redns.redis-cloud.com',
         port: 17554,
         tls: {},
     }
