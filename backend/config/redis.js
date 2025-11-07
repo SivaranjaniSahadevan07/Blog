@@ -4,10 +4,10 @@ const redisClient = redis.createClient({
     // host: '127.0.0.1',
     // port: 6379 // Default Redis port
     username: 'default',
-    password: 'drzCG2bEVjSAkxRyXJ0a8Oi5ZehxiNY9',
+    password: 'sRALrOaDUy5yBqDHVDzMLwXnSh7Klmod',
     socket: {
-        host: 'redis-12380.c277.us-east-1-3.ec2.redns.redis-cloud.com',
-        port: 12380,
+        host: 'redis-17554.c277.us-east-1-3.ec2.redns.redis-cloud.com',
+        port: 17554,
         tls: {},
     }
 });
