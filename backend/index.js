@@ -54,13 +54,13 @@ const startServer = async () => {
         res.status(err.status || 500).json({ message: err.message || 'Server Error' });
     });
 
-    app.use('*', (req, res) => {
-        res.status(404).send('Endpoint not found');
-    });
-
     app.get('/', (req, res) => {
         res.send('API is running...');
     });
+
+    //  app.use('*', (req, res) => {
+    //     res.status(404).send('Endpoint not found');
+    // });
 
     app.listen(PORT, () => {
         const serverURL = `${PROTOCOL}://${HOST}:${PORT}`
