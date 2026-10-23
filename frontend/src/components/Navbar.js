@@ -48,11 +48,6 @@ const Navbar = () => {
                     <Link className="nav-link" to="/profile" onClick={closeMenu}>Profile</Link>
                   </li>
                 )}
-                {["admin", "editor"].includes(authUser?.role) && (
-                  <li className="nav-item">
-                    <Link className="nav-link" to="/create-blog" onClick={closeMenu}>Blog +</Link>
-                  </li>
-                )}
                 {authUser?.role === "reader" && (
                   <li className="nav-item">
                     <Link className="nav-link" to="/saved-blogs" onClick={closeMenu}>Saved Blogs</Link>

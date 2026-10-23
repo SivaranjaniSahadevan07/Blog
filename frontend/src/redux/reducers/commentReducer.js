@@ -26,7 +26,7 @@ import {
         return {
           ...state,
           comments: state.comments.map((comment) =>
-            comment._id === action.payload._id ? action.payload : comment
+            comment._id === action.payload?._id ? action.payload : comment
           ),
           error: null,
         };

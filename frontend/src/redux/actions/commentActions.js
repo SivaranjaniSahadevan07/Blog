@@ -45,13 +45,16 @@ export const editComment = (commentId, updatedComment) => async (dispatch, getSt
     });
     dispatch({
       type: EDIT_COMMENT,
-      payload: res.data, // Contains the updated comment
+      payload: res.data.comment,
     });
+    return { comment: res.data.comment, error: null };
   } catch (error) {
+    const message = error.response?.data?.message || error.response?.data?.error || 'Error editing comment';
     dispatch({
       type: COMMENT_ERROR,
-      payload: error.response?.data?.message || 'Error editing comment',
+      payload: message,
     });
+    return { comment: null, error: message };
   }
 };
 

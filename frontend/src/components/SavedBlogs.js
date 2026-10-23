@@ -1,63 +1,133 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import moment from 'moment';
 import { getSavedBlogs, removeSavedBlog } from '../redux/actions/userActions';
-import 'bootstrap/dist/css/bootstrap.min.css';
 
 const SavedBlogs = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { savedBlogs } = useSelector((state) => state.users);
+  const { savedBlogs: storedSavedBlogs } = useSelector((state) => state.users);
+  const savedBlogs = useMemo(
+    () => (Array.isArray(storedSavedBlogs) ? storedSavedBlogs.filter(Boolean) : []),
+    [storedSavedBlogs]
+  );
+  const [loading, setLoading] = useState(true);
+  const [removingId, setRemovingId] = useState(null);
+  const [search, setSearch] = useState('');
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    dispatch(getSavedBlogs());
+    let isCurrentRequest = true;
+    dispatch(getSavedBlogs())
+      .then((result) => {
+        if (!isCurrentRequest) return;
+        if (result === null) setError('Your saved stories could not be loaded. Please try again.');
+      })
+      .finally(() => {
+        if (isCurrentRequest) setLoading(false);
+      });
+    return () => {
+      isCurrentRequest = false;
+    };
   }, [dispatch]);
 
-  const handleRemove = (blogId) => {
-    dispatch(removeSavedBlog(blogId));
-  };
+  const filteredBlogs = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return savedBlogs;
+    return savedBlogs.filter((blog) => (
+      blog.title?.toLowerCase().includes(query) || blog.content?.toLowerCase().includes(query)
+    ));
+  }, [savedBlogs, search]);
 
-  const handleBlogClick = (blogId) => {
-    navigate(`/blog/${blogId}`); // Navigate to the blog detail page
+  const handleRemove = async (blogId) => {
+    setRemovingId(blogId);
+    setError('');
+    const removed = await dispatch(removeSavedBlog(blogId));
+    if (!removed) setError('This story could not be removed. Please try again.');
+    setRemovingId(null);
   };
 
   return (
-    <div className="container-fluid p-md-5 p-4 bg-dark-subtle">
-      <h1 className="text-center mb-4">Saved Blogs</h1>
-      <div className="row">
-        {savedBlogs?.length > 0 ? (
-          <div className="d-flex justify-content-evenly flex-wrap">
-            {savedBlogs.map((blog) => (
-              <div key={blog._id} className="col-md-4 m-1">
-                <div
-                  className="card h-100"
-                  onClick={() => handleBlogClick(blog._id)}
-                  style={{ cursor: 'pointer' }}
-                >
-                  <div className="card-body">
-                    <h5 className="card-title text-primary">{blog.title}</h5>
-                    <p className="card-text text-muted">
-                      {blog.content.substring(0, 100)}...
-                    </p>
+    <main className="saved-page">
+      <div className="saved-shell">
+        <header className="saved-heading">
+          <div>
+            <span className="eyebrow">YOUR PERSONAL COLLECTION</span>
+            <h1>Stories to come back to.</h1>
+            <p>Keep your favorite reads close, all in one place.</p>
+          </div>
+          <div className="saved-total">
+            <strong>{savedBlogs.length}</strong>
+            <span>{savedBlogs.length === 1 ? 'saved story' : 'saved stories'}</span>
+          </div>
+        </header>
+
+        <div className="saved-toolbar">
+          <label className="visually-hidden" htmlFor="saved-search">Search saved stories</label>
+          <input
+            id="saved-search"
+            type="search"
+            className="form-control"
+            placeholder="Search your saved stories..."
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          <span>Reading list</span>
+        </div>
+
+        {error && <p className="saved-error" role="alert">{error}</p>}
+
+        {loading ? (
+          <div className="saved-empty-state" role="status">
+            <span className="loading-spinner" aria-hidden="true" />
+            <p>Gathering your saved stories…</p>
+          </div>
+        ) : filteredBlogs.length ? (
+          <section className="saved-grid" aria-label="Saved stories">
+            {filteredBlogs.map((blog) => (
+              <article className="saved-story-card" key={blog._id}>
+                {blog.image ? (
+                  <Link to={`/blog/${blog._id}`} className="saved-story-image-link" aria-label={`Read ${blog.title}`}>
+                    <img src={blog.image} alt="" className="saved-story-image" loading="lazy" />
+                  </Link>
+                ) : (
+                  <div className="saved-story-placeholder" aria-hidden="true">✳</div>
+                )}
+                <div className="saved-story-content">
+                  <div className="saved-story-meta">
+                    <span>Saved for later</span>
+                    {blog.createdAt && <time dateTime={blog.createdAt}>{moment(blog.createdAt).format('MMM D, YYYY')}</time>}
                   </div>
-                  <div className="card-footer text-end">
+                  <h2><Link to={`/blog/${blog._id}`}>{blog.title || 'Untitled story'}</Link></h2>
+                  <p>{blog.content ? `${blog.content.slice(0, 150)}${blog.content.length > 150 ? '…' : ''}` : 'Open this story to continue reading.'}</p>
+                  {blog.author?.username && <span className="saved-story-author">By {blog.author.username}</span>}
+                  <div className="saved-story-actions">
+                    <Link to={`/blog/${blog._id}`} className="saved-read-link">Read story <span aria-hidden="true">→</span></Link>
                     <button
-                      className="btn btn-sm btn-danger"
-                      onClick={(e) => {
-                        e.stopPropagation(); // Prevent triggering the blog click
-                        handleRemove(blog._id);
-                      }}
+                      className="saved-remove-button"
+                      type="button"
+                      onClick={() => handleRemove(blog._id)}
+                      disabled={removingId === blog._id}
                     >
-                      Remove
+                      {removingId === blog._id ? 'Removing…' : 'Remove'}
                     </button>
                   </div>
                 </div>
-              </div>
+              </article>
             ))}
-          </div>) : <p className="text-center">No blogs have been saved yet!</p>
-        }
+          </section>
+        ) : (
+          <section className="saved-empty-state">
+            <span aria-hidden="true">♡</span>
+            <h2>{savedBlogs.length ? 'No matching stories' : 'Your reading list is ready'}</h2>
+            <p>{savedBlogs.length
+              ? 'Try a different search term.'
+              : 'Save a story from the journal and it will be waiting for you here.'}</p>
+            {!savedBlogs.length && <Link className="saved-browse-link" to="/">Explore stories <span aria-hidden="true">→</span></Link>}
+          </section>
+        )}
       </div>
-    </div>
+    </main>
   );
 };
 

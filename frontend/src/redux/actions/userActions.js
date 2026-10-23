@@ -213,8 +213,10 @@ export const getSavedBlogs = () => async (dispatch, getState) => {
     // console.log(res.data)
 
     dispatch({ type: GET_SAVED_BLOGS, payload: res.data.savedBlogs });
+    return res.data.savedBlogs;
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to fetch saved blogs' });
+    return null;
   }
 };
 
@@ -229,7 +231,9 @@ export const removeSavedBlog = (blogId) => async (dispatch, getState) => {
       },
     });
     dispatch({ type: REMOVE_SAVED_BLOG, payload: blogId });
+    return true;
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to remove saved blog' });
+    return false;
   }
 };

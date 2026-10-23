@@ -16,6 +16,7 @@ const Comments = ({ blogId, blogAuthorId }) => {
   const [error, setError] = useState('');
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [editedContent, setEditedContent] = useState('');
+  const [savingEdit, setSavingEdit] = useState(false);
 
   useEffect(() => {
     let isCurrentRequest = true;
@@ -42,11 +43,22 @@ const Comments = ({ blogId, blogAuthorId }) => {
   };
 
   const handleSaveEdit = async (commentId) => {
-    if (!editedContent.trim()) return;
-    await dispatch(editComment(commentId, { content: editedContent.trim() }));
-    setEditingCommentId(null);
-    setEditedContent('');
-    await refreshComments();
+    if (!editedContent.trim() || savingEdit) return;
+    setSavingEdit(true);
+    setError('');
+    try {
+      const result = await dispatch(editComment(commentId, { content: editedContent.trim() }));
+      if (!result?.comment) {
+        setError(result?.error || 'Your comment could not be updated. Please try again.');
+        return;
+      }
+      setError('');
+      setEditingCommentId(null);
+      setEditedContent('');
+      await refreshComments();
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
   const handleDelete = async (commentId) => {
@@ -100,8 +112,10 @@ const Comments = ({ blogId, blogAuthorId }) => {
                         aria-label="Edit comment"
                       />
                       <div className="comment-actions">
-                        <button className="comment-action-primary" type="button" onClick={() => handleSaveEdit(comment._id)}>Save changes</button>
-                        <button className="comment-action" type="button" onClick={() => setEditingCommentId(null)}>Cancel</button>
+                        <button className="comment-action-primary" type="button" onClick={() => handleSaveEdit(comment._id)} disabled={!editedContent.trim() || savingEdit}>
+                          {savingEdit ? 'Saving…' : 'Save changes'}
+                        </button>
+                        <button className="comment-action" type="button" onClick={() => setEditingCommentId(null)} disabled={savingEdit}>Cancel</button>
                       </div>
                     </div>
                   ) : (
