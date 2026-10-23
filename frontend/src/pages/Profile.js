@@ -54,7 +54,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="container-fluid row m-auto p-md-5 p-4 text-center d-flex justify-content-center bg-dark-subtle">
+    <main className="container-fluid row m-auto profile-page text-center d-flex justify-content-center">
       <div className="col-md-6">
         <h4 className="mb-4">Profile</h4>
         <div className="card">
@@ -129,7 +129,7 @@ const Profile = () => {
           <button className="btn btn-primary mt-3" type="submit">Change Password</button>
         </form>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -19,7 +19,7 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-3">
+    <nav className="navbar navbar-expand-lg navbar-light">
       <Link className="navbar-brand" to="/">MyBlogApp</Link>
       <button
         className="navbar-toggler"
@@ -75,10 +75,10 @@ const Navbar = () => {
                 <img
                   src={profileUser?.profileImage || "default-avatar.png"}
                   alt="Profile"
-                  className="rounded-circle me-2 border border-light object-fit-cover"
+                  className="rounded-circle me-2 border object-fit-cover"
                   style={{ width: "30px", height: "30px" }}
                 />
-                <span className="navbar-text text-white">
+                <span className="navbar-text">
                   {profileUser?.username} ({authUser.role})
                 </span>
               </li>

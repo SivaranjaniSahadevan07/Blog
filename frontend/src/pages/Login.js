@@ -24,10 +24,8 @@ const Login = () => {
   }
 
   return (
-    <div className="container-fluid p-md-5 p-2 bg-dark-subtle h-100">
-
-      {/* <h2>Login</h2> */}
-      <form onSubmit={handleSubmit} className="p-4 border border-light bg-light rounded mx-auto" style={{width: "fit-content"}}>
+    <main className="auth-page">
+      <form onSubmit={handleSubmit} className="auth-card">
         <fieldset className="border border-3 p-3 rounded">
           <legend className="float-none w-auto px-2 fw-bold">Login</legend>
           <div className="mb-3">
@@ -56,7 +54,7 @@ const Login = () => {
           </div>
         </fieldset>
       </form>
-    </div>
+    </main>
   );
 };
 

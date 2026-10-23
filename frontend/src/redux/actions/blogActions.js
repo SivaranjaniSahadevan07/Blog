@@ -2,6 +2,9 @@ import axios from '../../api/axios';
 import {
   // GET_ALL_BLOGS,
   GET_BLOGS,
+  BLOGS_LOADING,
+  SINGLE_BLOG_LOADING,
+  SINGLE_BLOG_ERROR,
   GET_SINGLE_BLOG,
   GET_BLOGS_BY_USER,
   // GET_BLOGS_BY_CATEGORY,
@@ -12,18 +15,27 @@ import {
   BLOG_ERROR,
 } from '../../constants/actionTypes';
 
+const getBlogFetchError = (error, fallback) => (
+  error.response?.data?.message ||
+  (error.request
+    ? 'The blog server is taking a little longer to wake up. The first visit can take up to a minute.'
+    : fallback)
+);
+
 // Fetch all blogs
 export const getAllBlogs = (page, limit) => async (dispatch) => {
+  dispatch({ type: BLOGS_LOADING });
   try {
     const res = await axios.get(`/blogs?page=${page}&limit=${limit}`);
     dispatch({ type: GET_BLOGS, payload: res.data });
   } catch (error) {
-    dispatch({ type: BLOG_ERROR, payload: error.response?.data?.message || 'Failed to fetch blogs' });
+    dispatch({ type: BLOG_ERROR, payload: getBlogFetchError(error, 'Failed to fetch blogs') });
   }
 };
 
 // Get a single blog by ID
 export const getSingleBlog = (blogId) => async (dispatch) => {
+  dispatch({ type: SINGLE_BLOG_LOADING });
   try {
     const res = await axios.get(`/blogs/${blogId}`);
     dispatch({
@@ -32,20 +44,21 @@ export const getSingleBlog = (blogId) => async (dispatch) => {
     });
   } catch (error) {
     dispatch({
-      type: BLOG_ERROR,
-      payload: error.response?.data?.message || 'Error fetching blog',
+      type: SINGLE_BLOG_ERROR,
+      payload: getBlogFetchError(error, 'Error fetching blog'),
     });
   }
 };
 
 // Fetch blogs by category
 export const getBlogsByUser = (userId, page, limit) => async (dispatch) => {
+  dispatch({ type: BLOGS_LOADING });
   try {
     const res = await axios.get(`/blogs/user/${userId}?page=${page}&limit=${limit}`);
     // console.log(res.data)
     dispatch({ type: GET_BLOGS_BY_USER, payload: res.data });
   } catch (error) {
-    dispatch({ type: BLOG_ERROR, payload: error.response?.data?.message || 'Failed to fetch blogs by user' });
+    dispatch({ type: BLOG_ERROR, payload: getBlogFetchError(error, 'Failed to fetch blogs by user') });
   }
 };
 
@@ -61,12 +74,13 @@ export const getBlogsByUser = (userId, page, limit) => async (dispatch) => {
 // };
 
 export const getBlogsByCategory = (categoryId, page, limit) => async (dispatch) => {
+  dispatch({ type: BLOGS_LOADING });
   try {
     const res = await axios.get(`/blogs/category/${categoryId}?page=${page}&limit=${limit}`);
     dispatch({ type: GET_BLOGS, payload: res.data });
     return { payload: res.data }; // Return the response data
   } catch (error) {
-    dispatch({ type: BLOG_ERROR, payload: error.response?.data?.message || 'Failed to fetch blogs by category' });
+    dispatch({ type: BLOG_ERROR, payload: getBlogFetchError(error, 'Failed to fetch blogs by category') });
     return { payload: { totalBlogs: 0 } }; // Return 0 blogs in case of an error
   }
 };
@@ -189,22 +203,24 @@ export const likeDislikeBlog = (blogId, actionType) => async (dispatch, getState
 
 // Fetch admin blogs
 export const getAdminBlogs = (page, limit) => async (dispatch) => {
+  dispatch({ type: BLOGS_LOADING });
   try {
     const res = await axios.get(`/blogs/admin?page=${page}&limit=${limit}`);
     // console.log(res.data)
     dispatch({ type: GET_BLOGS, payload: res.data });
   } catch (error) {
     console.log(error)
-    dispatch({ type: BLOG_ERROR, payload: error.response?.data?.message || 'Failed to fetch admin blogs' });
+    dispatch({ type: BLOG_ERROR, payload: getBlogFetchError(error, 'Failed to fetch admin blogs') });
   }
 };
 
 // Search blogs
 export const searchBlogs = (query, page, limit) => async (dispatch) => {
+  dispatch({ type: BLOGS_LOADING });
   try {
     const res = await axios.get(`/blogs/search?q=${query}&page=${page}&limit=${limit}`);
     dispatch({ type: GET_BLOGS, payload: res.data });
   } catch (error) {
-    dispatch({ type: BLOG_ERROR, payload: error.response?.data?.message || 'Failed to search blogs' });
+    dispatch({ type: BLOG_ERROR, payload: getBlogFetchError(error, 'Failed to search blogs') });
   }
 };

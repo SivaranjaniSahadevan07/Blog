@@ -2,6 +2,9 @@ import {
   // GET_ALL_BLOGS,
   GET_BLOGS_BY_USER,
   GET_BLOGS,
+  BLOGS_LOADING,
+  SINGLE_BLOG_LOADING,
+  SINGLE_BLOG_ERROR,
   GET_SINGLE_BLOG,
   // GET_BLOGS_BY_CATEGORY,
   GET_BLOG_COMMENTS,
@@ -18,12 +21,28 @@ const initialState = {
   totalBlogs: 0,
   currentPage: 1,
   totalPages: 1,
+  loading: false,
+  singleBlogLoading: false,
+  singleBlogError: null,
   error: null,
 };
 
 const blogReducer = (state = initialState, action) => {
   switch (action.type) {
     // case GET_ALL_BLOGS:
+    case BLOGS_LOADING:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
+    case SINGLE_BLOG_LOADING:
+      return {
+        ...state,
+        singleBlogLoading: true,
+        singleBlogError: null,
+        blog: null,
+      };
     case GET_BLOGS: // Reuse GET_BLOGS for all filtered blog fetches
       return {
         ...state,
@@ -31,13 +50,15 @@ const blogReducer = (state = initialState, action) => {
         totalBlogs: action.payload.totalBlogs,
         currentPage: action.payload.currentPage,
         totalPages: action.payload.totalPages,
+        loading: false,
         error: null,
       };
     case GET_SINGLE_BLOG:
       return {
         ...state,
         blog: action.payload,
-        error: null,
+        singleBlogLoading: false,
+        singleBlogError: null,
       };
     case GET_BLOGS_BY_USER:
       return {
@@ -46,6 +67,7 @@ const blogReducer = (state = initialState, action) => {
         totalBlogs: action.payload.totalBlogs,
         currentPage: action.payload.currentPage,
         totalPages: action.payload.totalPages,
+        loading: false,
         error: null,
       };
     // case GET_BLOGS_BY_CATEGORY:
@@ -106,7 +128,15 @@ const blogReducer = (state = initialState, action) => {
     case BLOG_ERROR:
       return {
         ...state,
+        loading: false,
+        singleBlogLoading: false,
         error: action.payload,
+      };
+    case SINGLE_BLOG_ERROR:
+      return {
+        ...state,
+        singleBlogLoading: false,
+        singleBlogError: action.payload,
       };
     default:
       return state;

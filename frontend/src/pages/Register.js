@@ -17,8 +17,8 @@ const Register = () => {
   };
 
   return (
-    <div className="container-fluid p-md-5 p-2 bg-dark-subtle">
-      <form onSubmit={handleSubmit} className="p-4 border border-light bg-light rounded mx-auto" style={{ width: "fit-content" }}>
+    <main className="auth-page">
+      <form onSubmit={handleSubmit} className="auth-card">
         <fieldset className="border border-3 p-3 rounded">
           <legend className="float-none w-auto px-2 fw-bold">Register</legend>
           <div className="mb-3">
@@ -56,7 +56,7 @@ const Register = () => {
           </div>
         </fieldset>
       </form>
-    </div>
+    </main>
   );
 };
 

@@ -11,7 +11,7 @@ import moment from 'moment';
 
 const Blogs = () => {
   const dispatch = useDispatch();
-  const { blogs, totalBlogs, currentPage, totalPages, error } = useSelector((state) => state.blogs);
+  const { blogs, totalBlogs, currentPage, totalPages, error, loading } = useSelector((state) => state.blogs);
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { category } = useSelector((state) => state.categories);
   const { savedBlogs } = useSelector((state) => state.users)
@@ -20,8 +20,19 @@ const Blogs = () => {
   const [selectedCategory, setSelectedCategory] = useState(null); // Track selected category
   const [searchQuery, setSearchQuery] = useState(''); // Track search query
   const [filter, setFilter] = useState('latest'); // Track selected filter (latest, admin, category)
+  const [serverWaking, setServerWaking] = useState(false);
 
   const limit = 10; // Number of blogs per page
+
+  useEffect(() => {
+    if (!loading) {
+      setServerWaking(false);
+      return undefined;
+    }
+
+    const timer = window.setTimeout(() => setServerWaking(true), 1500);
+    return () => window.clearTimeout(timer);
+  }, [loading]);
 
   // Fetch blogs based on filter
   useEffect(() => {
@@ -86,12 +97,40 @@ const Blogs = () => {
     }
   };
 
+  const handleRetry = () => {
+    if (filter === 'category' && selectedCategory) {
+      dispatch(getBlogsByCategory(selectedCategory, page, limit));
+    } else if (filter === 'admin') {
+      dispatch(getAdminBlogs(page, limit));
+    } else if (filter === 'search' && searchQuery) {
+      dispatch(searchBlogs(searchQuery, page, limit));
+    } else {
+      dispatch(getAllBlogs(page, limit));
+    }
+  };
+
   return (
-    <div className="container-fluid bg-dark-subtle p-md-5 pb-4">
-      <div className="row">
-        {/* Main Content */}
-        <div className="col-md-8 mt-2 pb-md-5">
-          <h4 className="mb-4">
+    <main className="blog-home">
+      <section className="blog-hero">
+        <div className="blog-hero-content">
+          <span className="eyebrow">A little inspiration, every day</span>
+          <h1>Ideas worth<br /><span>sharing.</span></h1>
+          <p>Stories, perspectives, and thoughtful reads from our community.</p>
+          <a href="#stories" className="hero-link">Explore the latest <span aria-hidden="true">↓</span></a>
+        </div>
+        <div className="hero-art" aria-hidden="true">
+          <div className="hero-art-orbit orbit-one" />
+          <div className="hero-art-orbit orbit-two" />
+          <div className="hero-art-note">Read<br />something<br /><em>new.</em></div>
+        </div>
+      </section>
+
+      <div className="blog-layout" id="stories">
+        <section className="feed-section">
+          <div className="feed-heading">
+            <div>
+              <span className="eyebrow">The journal</span>
+              <h2>
             {filter === 'category' && selectedCategory
               ? `Blogs in ${category?.name} (${totalBlogs})`
               : filter === 'admin'
@@ -99,19 +138,47 @@ const Blogs = () => {
                 : filter === 'search'
                   ? `Search Results for "${searchQuery}" (${totalBlogs})`
                   : `Latest Blogs (${totalBlogs})`}
-          </h4>
-          {error && <p className="text-danger">{error}</p>}
-          <div className="row order-md-first order-last">
+              </h2>
+            </div>
+            <span className="feed-count">{totalBlogs} {totalBlogs === 1 ? 'story' : 'stories'}</span>
+          </div>
+          {error && !loading && (
+            <div className="connection-notice" role="status">
+              <span className="connection-icon" aria-hidden="true">↻</span>
+              <div>
+                <strong>{error.includes('wake up') ? 'Just a moment — the server is waking up' : 'We couldn’t load the stories'}</strong>
+                <p>{error}</p>
+                {error.includes('wake up') && <p className="connection-hint">You’re still connected to the site. This can take up to a minute on a first visit.</p>}
+                <button className="text-button" type="button" onClick={handleRetry}>Try again</button>
+              </div>
+            </div>
+          )}
+          {loading ? (
+            <div className="loading-panel" role="status" aria-live="polite">
+              <span className="loading-spinner" aria-hidden="true" />
+              <div>
+                <strong>{serverWaking ? 'The blog server is waking up…' : 'Loading stories…'}</strong>
+                <p>{serverWaking
+                  ? 'The first visit can take up to a minute. You’re in the right place — your stories are on their way.'
+                  : 'Getting the journal ready for you.'}</p>
+              </div>
+              <div className="skeleton-stack" aria-hidden="true">
+                <span /><span /><span />
+              </div>
+            </div>
+          ) : (
+          <div className="story-list">
             {blogs.map((blog) => (
-              <div className="row-md-4 mb-3" key={blog._id}>
-                <div className="card bg-light-subtle">
+              <article className="story-card" key={blog._id}>
+                {blog.image && <img src={blog.image} alt="" className="story-image" />}
+                <div className="story-content">
                   {isAuthenticated && user.role === 'reader' ? (
-                    <div className="text-end mt-2 me-2 mb-0">
+                    <div className="story-save">
                       {savedBlogs.find(sblog => sblog._id === blog._id) ? (
-                        <span className="badge bg-success">Saved</span> // Show "Saved" label
+                        <span className="saved-label">Saved</span>
                       ) : (
                         <button
-                          className="btn btn-outline-primary btn-sm"
+                          className="save-button"
                           onClick={() => {
                             handleBlogSave(blog._id);
                           }}
@@ -121,93 +188,84 @@ const Blogs = () => {
                       )}
                     </div>
                   ) : null}
-
-                  <div className="card-body">
-                    <span className="text-muted">{moment(blog.createdAt).fromNow()}</span> {/* Time ago */}
-                    <h5 className="card-title">{blog.title}</h5>
-                    <p className="card-text">{blog.content.substring(0, 100)}...</p>
-                    <p className="card-text">Posted by <i>{blog.author.username}</i></p>
-                    <div className='d-flex justify-content-between'>
-                      <div>
-                        <Link to={`/blog/${blog._id}`} className="btn btn-primary">
-                          Read More
-                        </Link>
-                      </div>
-                      <div>
-                        {user && user.role === 'admin' && (
-                          <button
-                            className="btn btn-danger btn-sm"
-                            onClick={() => handleBlogDelete(blog._id)}
-                          >
-                            Delete
-                          </button>
-                        )}
-                      </div>
+                  <span className="story-date">{moment(blog.createdAt).fromNow()}</span>
+                  <h3>{blog.title}</h3>
+                  <p className="story-excerpt">{blog.content.substring(0, 160)}{blog.content.length > 160 ? '…' : ''}</p>
+                  <div className="story-meta">
+                    <span>By <strong>{blog.author.username}</strong></span>
+                    <div className="story-actions">
+                      <Link to={`/blog/${blog._id}`} className="read-link">Read story <span aria-hidden="true">→</span></Link>
+                      {user && user.role === 'admin' && (
+                        <button className="delete-link" onClick={() => handleBlogDelete(blog._id)}>Delete</button>
+                      )}
                     </div>
                   </div>
                 </div>
-              </div>
+              </article>
             ))}
           </div>
-          <div className="d-flex justify-content-between mt-4">
+          )}
+          {!loading && !error && blogs.length === 0 && (
+            <div className="empty-state">
+              <span aria-hidden="true">✳</span>
+              <h3>No stories here yet</h3>
+              <p>Try another category or check back soon for something new.</p>
+            </div>
+          )}
+          {!loading && blogs.length > 0 && <div className="pagination-bar">
             <button
-              className="btn btn-secondary"
+              className="pagination-button"
               onClick={handlePreviousPage}
-              disabled={page === 1}
+              disabled={page === 1 || loading}
             >
-              Previous
+              ← Previous
             </button>
-            <span>
-              Page {currentPage} of {totalPages}
+            <span className="pagination-label">
+              Page {currentPage} <span>of</span> {totalPages}
             </span>
             <button
-              className="btn btn-secondary"
+              className="pagination-button"
               onClick={handleNextPage}
-              disabled={page === totalPages}
+              disabled={page === totalPages || loading}
             >
-              Next
+              Next →
             </button>
-          </div>
-        </div>
+          </div>}
+        </section>
 
-        {/* Sidebar */}
-        <div className="col-md-4 order-first order-md-last bg-secondary-subtle p-3 sticky-md-top" style={{ height: "fit-content" }}>
-          {/* Search Bar */}
-          <form onSubmit={handleSearch} className="mb-4">
-            <input
-              type="text"
-              className="form-control"
-              placeholder="Search blogs..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <button type="submit" className="btn btn-primary mt-2 w-100">
-              Search
-            </button>
+        <aside className="blog-sidebar">
+          <form onSubmit={handleSearch} className="search-form">
+            <label htmlFor="blog-search">Find a story</label>
+            <div className="search-input-wrap">
+              <input
+                id="blog-search"
+                type="search"
+                placeholder="Search the journal..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              <button type="submit" aria-label="Search stories">⌕</button>
+            </div>
           </form>
-
-          {/* Filters */}
-          <div className="mb-4">
-            <h5>Filters</h5>
+          <div className="filter-group">
+            <h3>Browse</h3>
             <button
-              className={`btn btn-link ${filter === 'latest' ? 'fw-bold' : ''}`}
+              className={`filter-button ${filter === 'latest' ? 'is-active' : ''}`}
               onClick={() => handleFilterChange('latest')}
             >
-              Latest Blogs
+              <span>Latest stories</span><span aria-hidden="true">→</span>
             </button>
             <button
-              className={`btn btn-link ${filter === 'admin' ? 'fw-bold' : ''}`}
+              className={`filter-button ${filter === 'admin' ? 'is-active' : ''}`}
               onClick={() => handleFilterChange('admin')}
             >
-              Admin Blogs
+              <span>Editor's picks</span><span aria-hidden="true">→</span>
             </button>
           </div>
-
-          {/* Categories */}
           <Categories onCategoryClick={handleCategoryClick} />
-        </div>
+        </aside>
       </div>
-    </div>
+    </main>
   );
 };
 

@@ -20,31 +20,31 @@ const Categories = ({ onCategoryClick }) => {
   };
 
   if (!categories || categories.length === 0) {
-    return <p>Loading categories...</p>; // Handle loading state
+    return <section className="categories-widget">
+      <h5 className="categories-title">Topics</h5>
+      <p className="text-muted small mb-0">{error ? 'Topics are temporarily unavailable.' : 'Loading topics…'}</p>
+    </section>;
   }
 
   return (
-    <div style={{ width: 'fit-content' }} className='p-3'>
-      <h5>Categories</h5>
+    <section className="categories-widget">
+      <h5 className="categories-title">Topics</h5>
       {error && <p className="text-danger">{error}</p>}
-      <ul className="list-group d-flex flex-row flex-wrap">
+      <ul className="categories-list">
         {categories.map((category) => (
-          <li
-            key={category._id}
-            className="list-group-item m-1 d-flex justify-content-between align-items-center"
-            style={{ cursor: onCategoryClick ? 'pointer' : 'default' }}
-          >
-            <span
+          <li key={category._id}>
+            <button
+              type="button"
+              className="category-chip"
               onClick={onCategoryClick ? () => onCategoryClick(category._id) : undefined}
+              disabled={!onCategoryClick}
             >
-              {category.name}{' '}
-              <span className="badge bg-primary">
-                {category.blogCount || 0} {/* Display blog count */}
-              </span>
-            </span>
+              {category.name}
+              <span className="category-count">{category.blogCount || 0}</span>
+            </button>
             {user?.role === "admin" && category.blogCount === 0 && (
               <button
-                className="btn btn-sm btn-danger"
+                className="delete-link"
                 onClick={() => handleDelete(category._id)}
               >
                 Delete
@@ -53,7 +53,7 @@ const Categories = ({ onCategoryClick }) => {
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   );
 };
 
