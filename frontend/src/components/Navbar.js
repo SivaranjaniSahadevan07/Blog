@@ -77,10 +77,15 @@ const Navbar = () => {
               <>
                 <li className="nav-item navbar-account">
                   <img
-                    src={profileUser?.profileImage || "default-avatar.png"}
+                    src={profileUser?.profileImage || "/default-profile.svg"}
                     alt=""
                     className="rounded-circle border object-fit-cover"
                     style={{ width: "32px", height: "32px" }}
+                    onError={(event) => {
+                      if (!event.currentTarget.src.endsWith("/default-profile.svg")) {
+                        event.currentTarget.src = "/default-profile.svg";
+                      }
+                    }}
                   />
                   <span className="navbar-text">
                     {profileUser?.username || authUser?.username || "Account"} <span className="navbar-role">({authUser?.role})</span>

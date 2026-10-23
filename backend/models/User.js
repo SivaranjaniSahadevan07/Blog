@@ -1,9 +1,6 @@
 const mongoose = require('mongoose')
 const bcrypt = require('bcryptjs');
 
-// Get the base URL from environment variables
-const DEFAULT_IMAGE_BASE_URL = process.env.DEFAULT_IMAGE_BASE_URL;
-
 const userSchema = mongoose.Schema({
     username: {
         type: String,
@@ -34,7 +31,7 @@ const userSchema = mongoose.Schema({
     ],
     profileImage: {
         type: String,
-        default: `${DEFAULT_IMAGE_BASE_URL}/default-profile.png`
+        default: '/default-profile.svg'
     },
 })
 

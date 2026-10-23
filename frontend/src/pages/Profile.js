@@ -98,9 +98,14 @@ const Profile = () => {
           <section className="profile-card">
             <div className="profile-avatar-wrap">
               <img
-                src={user?.profileImage || 'default-profile.png'}
+                src={user?.profileImage || '/default-profile.svg'}
                 className="profile-avatar"
                 alt={user?.username ? `${user.username}'s profile` : 'Profile'}
+                onError={(event) => {
+                  if (!event.currentTarget.src.endsWith('/default-profile.svg')) {
+                    event.currentTarget.src = '/default-profile.svg';
+                  }
+                }}
               />
               <span className="profile-role">{user?.role || 'Member'}</span>
             </div>
