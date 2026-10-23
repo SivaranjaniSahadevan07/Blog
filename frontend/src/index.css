@@ -105,6 +105,35 @@ a {
   filter: brightness(0) saturate(100%) invert(29%) sepia(17%) saturate(1153%) hue-rotate(91deg) brightness(95%) contrast(88%);
 }
 
+.navbar .navbar-collapse {
+  align-items: center;
+}
+
+.navbar-account {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.45rem 0.6rem;
+}
+
+.navbar-role {
+  color: var(--muted);
+  font-size: 0.82em;
+}
+
+.navbar .navbar-logout {
+  border: 1px solid #d5e1d7;
+  background: #edf4ef;
+  color: var(--green-dark);
+}
+
+.navbar .navbar-logout:hover,
+.navbar .navbar-logout:focus {
+  border-color: var(--green);
+  background: #e2eee5;
+  color: var(--green-dark);
+}
+
 .navbar .btn {
   padding: 0.55rem 1rem;
   border-radius: 999px;
@@ -122,6 +151,47 @@ a {
   border-color: var(--green-dark);
   background: var(--green-dark);
   color: white;
+}
+
+@media (max-width: 991.98px) {
+  .navbar {
+    min-height: 68px;
+    padding: 0.7rem max(4vw, 1rem) !important;
+  }
+
+  .navbar .navbar-collapse {
+    margin-top: 0.75rem;
+    padding: 0.5rem 0 0.2rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .navbar .navbar-nav {
+    gap: 0.15rem;
+  }
+
+  .navbar .nav-link {
+    padding: 0.6rem 0.75rem !important;
+    border-radius: 8px;
+  }
+
+  .navbar .navbar-account-nav {
+    align-items: flex-start;
+    margin-top: 0.65rem;
+    padding-top: 0.65rem;
+    border-top: 1px solid var(--line);
+  }
+
+  .navbar-account {
+    padding-left: 0.65rem;
+  }
+
+  .navbar-account-nav > .nav-item {
+    margin: 0.15rem 0;
+  }
+
+  .navbar-account-nav .btn {
+    min-width: 88px;
+  }
 }
 
 .navbar .btn-outline-light {

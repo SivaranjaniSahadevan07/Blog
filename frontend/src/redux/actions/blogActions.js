@@ -17,6 +17,7 @@ import {
 
 const getBlogFetchError = (error, fallback) => (
   error.response?.data?.message ||
+  error.response?.data?.error ||
   (error.request
     ? 'The blog server is taking a little longer to wake up. The first visit can take up to a minute.'
     : fallback)
@@ -40,13 +41,16 @@ export const getSingleBlog = (blogId) => async (dispatch) => {
     const res = await axios.get(`/blogs/${blogId}`);
     dispatch({
       type: GET_SINGLE_BLOG,
-      payload: res.data, // Contains the blog details
+      payload: res.data,
     });
+    return res.data;
   } catch (error) {
+    const message = getBlogFetchError(error, 'Error fetching blog');
     dispatch({
       type: SINGLE_BLOG_ERROR,
-      payload: getBlogFetchError(error, 'Error fetching blog'),
+      payload: message,
     });
+    throw new Error(message);
   }
 };
 
