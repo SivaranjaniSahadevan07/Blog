@@ -43,16 +43,16 @@ const Comments = ({ blogId, blogAuthorId }) => {
   };
 
   const handleSaveEdit = async (commentId) => {
-    if (!editedContent.trim() || savingEdit) return;
+    const content = editedContent.trim();
+    if (!content || savingEdit) return;
     setSavingEdit(true);
     setError('');
     try {
-      const result = await dispatch(editComment(commentId, { content: editedContent.trim() }));
+      const result = await dispatch(editComment(commentId, { content }));
       if (!result?.comment) {
         setError(result?.error || 'Your comment could not be updated. Please try again.');
         return;
       }
-      setError('');
       setEditingCommentId(null);
       setEditedContent('');
       await refreshComments();
@@ -108,9 +108,11 @@ const Comments = ({ blogId, blogAuthorId }) => {
                         className="form-control"
                         rows={3}
                         value={editedContent}
+                        maxLength={2000}
                         onChange={(event) => setEditedContent(event.target.value)}
                         aria-label="Edit comment"
                       />
+                      <div className="comment-edit-count">{editedContent.length}/2000</div>
                       <div className="comment-actions">
                         <button className="comment-action-primary" type="button" onClick={() => handleSaveEdit(comment._id)} disabled={!editedContent.trim() || savingEdit}>
                           {savingEdit ? 'Saving…' : 'Save changes'}

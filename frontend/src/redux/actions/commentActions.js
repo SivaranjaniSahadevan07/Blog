@@ -43,11 +43,12 @@ export const editComment = (commentId, updatedComment) => async (dispatch, getSt
         Authorization: `Bearer ${auth.accessToken}`,
       },
     });
+    const comment = res.data.comment;
     dispatch({
       type: EDIT_COMMENT,
-      payload: res.data.comment,
+      payload: comment,
     });
-    return { comment: res.data.comment, error: null };
+    return { comment, error: null };
   } catch (error) {
     const message = error.response?.data?.message || error.response?.data?.error || 'Error editing comment';
     dispatch({

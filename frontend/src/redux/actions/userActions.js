@@ -213,9 +213,10 @@ export const getSavedBlogs = () => async (dispatch, getState) => {
     // console.log(res.data)
 
     dispatch({ type: GET_SAVED_BLOGS, payload: res.data.savedBlogs });
-    return res.data.savedBlogs;
+    return Array.isArray(res.data.savedBlogs) ? res.data.savedBlogs : [];
   } catch (error) {
-    dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to fetch saved blogs' });
+    const message = error.response?.data?.message || 'Failed to fetch saved blogs';
+    dispatch({ type: USER_ERROR, payload: message });
     return null;
   }
 };
@@ -231,9 +232,10 @@ export const removeSavedBlog = (blogId) => async (dispatch, getState) => {
       },
     });
     dispatch({ type: REMOVE_SAVED_BLOG, payload: blogId });
-    return true;
+    return { success: true };
   } catch (error) {
-    dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to remove saved blog' });
-    return false;
+    const message = error.response?.data?.message || 'Failed to remove saved blog';
+    dispatch({ type: USER_ERROR, payload: message });
+    return { success: false, error: message };
   }
 };

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import moment from 'moment';
@@ -6,44 +6,44 @@ import { getSavedBlogs, removeSavedBlog } from '../redux/actions/userActions';
 
 const SavedBlogs = () => {
   const dispatch = useDispatch();
-  const { savedBlogs: storedSavedBlogs } = useSelector((state) => state.users);
+  const { savedBlogs: storedBlogs } = useSelector((state) => state.users);
   const savedBlogs = useMemo(
-    () => (Array.isArray(storedSavedBlogs) ? storedSavedBlogs.filter(Boolean) : []),
-    [storedSavedBlogs]
+    () => (Array.isArray(storedBlogs) ? storedBlogs.filter(Boolean) : []),
+    [storedBlogs]
   );
   const [loading, setLoading] = useState(true);
   const [removingId, setRemovingId] = useState(null);
   const [search, setSearch] = useState('');
   const [error, setError] = useState('');
 
-  useEffect(() => {
-    let isCurrentRequest = true;
-    dispatch(getSavedBlogs())
-      .then((result) => {
-        if (!isCurrentRequest) return;
-        if (result === null) setError('Your saved stories could not be loaded. Please try again.');
-      })
-      .finally(() => {
-        if (isCurrentRequest) setLoading(false);
-      });
-    return () => {
-      isCurrentRequest = false;
-    };
+  const loadSavedBlogs = useCallback(async () => {
+    setLoading(true);
+    setError('');
+    const result = await dispatch(getSavedBlogs());
+    if (result === null) setError('Your saved stories could not be loaded. Please try again.');
+    setLoading(false);
   }, [dispatch]);
+
+  useEffect(() => {
+    loadSavedBlogs();
+  }, [loadSavedBlogs]);
 
   const filteredBlogs = useMemo(() => {
     const query = search.trim().toLowerCase();
     if (!query) return savedBlogs;
     return savedBlogs.filter((blog) => (
-      blog.title?.toLowerCase().includes(query) || blog.content?.toLowerCase().includes(query)
+      blog.title?.toLowerCase().includes(query) ||
+      blog.content?.toLowerCase().includes(query) ||
+      blog.author?.username?.toLowerCase().includes(query)
     ));
   }, [savedBlogs, search]);
 
   const handleRemove = async (blogId) => {
+    if (removingId) return;
     setRemovingId(blogId);
     setError('');
-    const removed = await dispatch(removeSavedBlog(blogId));
-    if (!removed) setError('This story could not be removed. Please try again.');
+    const result = await dispatch(removeSavedBlog(blogId));
+    if (!result?.success) setError(result?.error || 'This story could not be removed. Please try again.');
     setRemovingId(null);
   };
 
@@ -75,7 +75,11 @@ const SavedBlogs = () => {
           <span>Reading list</span>
         </div>
 
-        {error && <p className="saved-error" role="alert">{error}</p>}
+        {error && (
+          <p className="saved-error" role="alert">
+            {error} <button type="button" onClick={loadSavedBlogs}>Try again</button>
+          </p>
+        )}
 
         {loading ? (
           <div className="saved-empty-state" role="status">
@@ -87,11 +91,11 @@ const SavedBlogs = () => {
             {filteredBlogs.map((blog) => (
               <article className="saved-story-card" key={blog._id}>
                 {blog.image ? (
-                  <Link to={`/blog/${blog._id}`} className="saved-story-image-link" aria-label={`Read ${blog.title}`}>
+                  <Link to={`/blog/${blog._id}`} className="saved-story-image-link" aria-label={`Read ${blog.title || 'story'}`}>
                     <img src={blog.image} alt="" className="saved-story-image" loading="lazy" />
                   </Link>
                 ) : (
-                  <div className="saved-story-placeholder" aria-hidden="true">✳</div>
+                  <Link to={`/blog/${blog._id}`} className="saved-story-placeholder" aria-label={`Read ${blog.title || 'story'}`}>✳</Link>
                 )}
                 <div className="saved-story-content">
                   <div className="saved-story-meta">
@@ -107,7 +111,7 @@ const SavedBlogs = () => {
                       className="saved-remove-button"
                       type="button"
                       onClick={() => handleRemove(blog._id)}
-                      disabled={removingId === blog._id}
+                      disabled={Boolean(removingId)}
                     >
                       {removingId === blog._id ? 'Removing…' : 'Remove'}
                     </button>

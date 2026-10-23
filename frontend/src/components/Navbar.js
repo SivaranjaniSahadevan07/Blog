@@ -38,14 +38,19 @@ const Navbar = () => {
         </button>
         <div className={`navbar-collapse ${menuOpen ? "show" : ""}`} id="navbarNav">
           <ul className="navbar-nav">
-            <li className="nav-item">
+            {/* <li className="nav-item">
               <Link className="nav-link" to="/" onClick={closeMenu}>Blogs</Link>
-            </li>
+            </li> */}
             {isAuthenticated && (
               <>
                 {["admin", "editor", "reader"].includes(authUser?.role) && (
                   <li className="nav-item">
                     <Link className="nav-link" to="/profile" onClick={closeMenu}>Profile</Link>
+                  </li>
+                )}
+                {["admin", "editor"].includes(authUser?.role) && (
+                  <li className="nav-item">
+                    <Link className="nav-link" to="/create-blog" onClick={closeMenu}>Blog +</Link>
                   </li>
                 )}
                 {authUser?.role === "reader" && (
