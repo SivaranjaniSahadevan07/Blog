@@ -55,11 +55,12 @@ export const createCategory = (categoryData) => async (dispatch, getState) => {
     });
     return { payload: res.data }; // Return the created category
   } catch (error) {
+    const message = error.response?.data?.message || 'Error creating category';
     dispatch({
       type: CATEGORY_ERROR,
-      payload: error.response?.data?.message || 'Error creating category',
+      payload: message,
     });
-    return { payload: null }; // Return null in case of an error
+    return { payload: null, error: message };
   }
 };
 

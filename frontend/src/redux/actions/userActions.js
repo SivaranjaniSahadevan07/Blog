@@ -34,20 +34,17 @@ export const updateProfilePicture = (formData) => async (dispatch, getState) => 
   try {
     const { auth } = getState();
 
-    // Append uploadType to the formData
-    formData.append('uploadType', 'profile');
-
     const res = await axios.put('/users/profile-picture?uploadType=profile', formData, {
       headers: {
         Authorization: `Bearer ${auth.accessToken}`,
-        'Content-Type': 'multipart/form-data', // Ensure the correct content type
-        'x-upload-type': 'profile', // Optional: Send as a custom header
       },
     });
 
     dispatch({ type: UPDATE_PROFILE_PICTURE, payload: res.data });
+    return res.data;
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to update profile picture' });
+    return null;
   }
 };
 
@@ -60,8 +57,10 @@ export const updateUsername = (username) => async (dispatch, getState) => {
       },
     });
     dispatch({ type: UPDATE_USERNAME, payload: res.data });
+    return res.data;
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to update username' });
+    return null;
   }
 };
 
@@ -74,8 +73,10 @@ export const updateEmail = (email) => async (dispatch, getState) => {
       },
     });
     dispatch({ type: UPDATE_EMAIL, payload: res.data });
+    return res.data;
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to update email' });
+    return null;
   }
 };
 
@@ -88,8 +89,10 @@ export const updatePassword = (oldPassword, newPassword) => async (dispatch, get
       },
     });
     dispatch({ type: UPDATE_PASSWORD, payload: res.data });
+    return res.data;
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to update password' });
+    return null;
   }
 };
 

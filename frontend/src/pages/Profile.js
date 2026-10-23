@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   getProfile,
@@ -10,124 +10,212 @@ import {
 
 const Profile = () => {
   const dispatch = useDispatch();
-  const { user, postedBlogs } = useSelector((state) => state.users);
-
+  const { user, postedBlogs, userError } = useSelector((state) => state.users);
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [oldPassword, setOldPassword] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [profileImage, setProfileImage] = useState(null);
+  const [imageError, setImageError] = useState('');
+  const [notice, setNotice] = useState('');
+  const [pending, setPending] = useState('');
   const fileInputRef = useRef(null);
 
   useEffect(() => {
     dispatch(getProfile());
   }, [dispatch]);
 
-  const handleProfilePictureChange = (e) => {
-    e.preventDefault();
-    const formData = new FormData();
-    formData.append('profileImage', profileImage);
-    dispatch(updateProfilePicture(formData));
-    setProfileImage(null); // Clear the input after submission
-    // Clear the file input
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+  const runUpdate = async (key, action, successMessage, reset) => {
+    if (pending) return;
+    setPending(key);
+    setNotice('');
+    try {
+      const result = await action();
+      if (result) {
+        setNotice(successMessage);
+        reset?.();
+      }
+    } finally {
+      setPending('');
     }
   };
 
-  const handleUsernameChange = (e) => {
-    e.preventDefault();
-    dispatch(updateUsername(username));
-    setUsername(''); // Clear the input after submission
+  const handleProfilePictureChange = async (event) => {
+    event.preventDefault();
+    if (!profileImage) return;
+    const formData = new FormData();
+    formData.append('profileImage', profileImage);
+    await runUpdate('image', () => dispatch(updateProfilePicture(formData)), 'Profile photo updated.', () => {
+      setProfileImage(null);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    });
   };
 
-  const handleEmailChange = (e) => {
-    e.preventDefault();
-    dispatch(updateEmail(email));
-    setEmail(''); // Clear the input after submission
+  const handleImageChange = (event) => {
+    const file = event.target.files?.[0];
+    setImageError('');
+    if (file && !['image/jpeg', 'image/png'].includes(file.type)) {
+      setImageError('Choose a JPG or PNG image.');
+      event.target.value = '';
+      setProfileImage(null);
+    } else if (file && file.size > 2 * 1024 * 1024) {
+      setImageError('Your image must be smaller than 2 MB.');
+      event.target.value = '';
+      setProfileImage(null);
+    } else {
+      setProfileImage(file || null);
+    }
   };
 
-  const handlePasswordChange = (e) => {
-    e.preventDefault();
-    dispatch(updatePassword(oldPassword, newPassword));
-    setOldPassword(''); // Clear the input after submission
+  const handleUsernameChange = (event) => {
+    event.preventDefault();
+    runUpdate('username', () => dispatch(updateUsername(username.trim())), 'Username updated.', () => setUsername(''));
+  };
+
+  const handleEmailChange = (event) => {
+    event.preventDefault();
+    runUpdate('email', () => dispatch(updateEmail(email.trim())), 'Email address updated.', () => setEmail(''));
+  };
+
+  const handlePasswordChange = (event) => {
+    event.preventDefault();
+    runUpdate('password', () => dispatch(updatePassword(oldPassword, newPassword)), 'Password updated.', () => {
+      setOldPassword('');
+      setNewPassword('');
+    });
   };
 
   return (
-    <main className="container-fluid row m-auto profile-page text-center d-flex justify-content-center">
-      <div className="col-md-6">
-        <h4 className="mb-4">Profile</h4>
-        <div className="card">
-          <div className="card-body">
-            <img src={user?.profileImage || 'default-profile.png'} className="rounded-circle card-img border border-dark object-fit-cover"
-              style={{ width: "100px", height: "100px" }} alt="profile-pic" />
-            <p className="card-title"><b>UserName: </b>{user?.username}</p>
-            <p><b>Email: </b>{user?.email}</p>
-            {user?.role !== "reader" && <p><b>Posted Blogs: </b>{postedBlogs}</p>}
-          </div>
-        </div>
-        <div className="p-5 pt-4">
-          <form className="d-flex flex-column align-items-center" onSubmit={handleProfilePictureChange}>
-            <input
-              type="file"
-              ref={fileInputRef}
-              name="profile-image"
-              className="form-control"
-              onChange={(e) => setProfileImage(e.target.files[0])}
-              required
-            />
-            <button className="btn btn-primary mt-3" type="submit">Change Profile</button>
-          </form>
-        </div>
-      </div>
+    <main className="profile-page profile-page-redesign">
+      <div className="profile-shell">
+        <header className="profile-heading">
+          <span className="eyebrow">YOUR ACCOUNT</span>
+          <h1>Make yourself at home.</h1>
+          <p>Manage your profile and keep your account details up to date.</p>
+        </header>
 
-      <div className="col-md-6">
-        <h4 className="mb-4">Change Credentials</h4>
-        <form className="d-flex flex-column align-items-center" onSubmit={handleUsernameChange}>
-          <input
-            type="text"
-            name="username"
-            className="form-control"
-            placeholder="Enter new username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-          />
-          <button className="btn btn-primary mt-3" type="submit">Change UserName</button>
-        </form>
-        <form className="d-flex flex-column align-items-center mt-3" onSubmit={handleEmailChange}>
-          <input
-            type="email"
-            name="email"
-            className="form-control"
-            placeholder="Enter new email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <button className="btn btn-primary mt-3" type="submit">Change Email</button>
-        </form>
-        <form className="d-flex flex-column align-items-center mt-3" onSubmit={handlePasswordChange}>
-          <input
-            type="password"
-            name="oldPassword"
-            className="form-control mb-2"
-            placeholder="Enter old Password"
-            value={oldPassword}
-            onChange={(e) => setOldPassword(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            name="newPassword"
-            className="form-control"
-            placeholder="Enter new password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            required
-          />
-          <button className="btn btn-primary mt-3" type="submit">Change Password</button>
-        </form>
+        <div className="profile-layout">
+          <section className="profile-card">
+            <div className="profile-avatar-wrap">
+              <img
+                src={user?.profileImage || 'default-profile.png'}
+                className="profile-avatar"
+                alt={user?.username ? `${user.username}'s profile` : 'Profile'}
+              />
+              <span className="profile-role">{user?.role || 'Member'}</span>
+            </div>
+            <h2>{user?.username || 'Your profile'}</h2>
+            <p className="profile-email">{user?.email || ' '}</p>
+            {user?.role !== 'reader' && (
+              <div className="profile-stat">
+                <strong>{postedBlogs || 0}</strong>
+                <span>stories published</span>
+              </div>
+            )}
+            <form className="profile-photo-form" onSubmit={handleProfilePictureChange}>
+              <label htmlFor="profile-photo">Profile photo</label>
+              <input
+                id="profile-photo"
+                type="file"
+                ref={fileInputRef}
+                name="profile-image"
+                className="form-control"
+                accept="image/jpeg,image/png"
+                onChange={handleImageChange}
+              />
+              <small>JPG or PNG · up to 2 MB</small>
+              {imageError && <p className="profile-inline-error" role="alert">{imageError}</p>}
+              <button className="profile-save-button" type="submit" disabled={!profileImage || pending === 'image'}>
+                {pending === 'image' ? 'Updating…' : 'Update photo'}
+              </button>
+            </form>
+          </section>
+
+          <section className="profile-settings">
+            <div className="profile-settings-heading">
+              <span className="eyebrow">ACCOUNT SETTINGS</span>
+              <h2>Update your details</h2>
+            </div>
+            {notice && <p className="profile-notice" role="status">{notice}</p>}
+            {userError && <p className="profile-inline-error" role="alert">{userError}</p>}
+
+            <form className="profile-edit-form" onSubmit={handleUsernameChange}>
+              <div className="profile-form-copy">
+                <h3>Username</h3>
+                <p>Choose the name readers see on your stories and comments.</p>
+              </div>
+              <div className="profile-form-controls">
+                <label className="visually-hidden" htmlFor="profile-username">New username</label>
+                <input
+                  id="profile-username"
+                  type="text"
+                  className="form-control"
+                  placeholder={user?.username || 'Enter a new username'}
+                  value={username}
+                  onChange={(event) => setUsername(event.target.value)}
+                  required
+                />
+                <button type="submit" className="profile-save-button" disabled={!username.trim() || pending === 'username'}>
+                  {pending === 'username' ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            </form>
+
+            <form className="profile-edit-form" onSubmit={handleEmailChange}>
+              <div className="profile-form-copy">
+                <h3>Email address</h3>
+                <p>Keep your sign-in address current.</p>
+              </div>
+              <div className="profile-form-controls">
+                <label className="visually-hidden" htmlFor="profile-email">New email address</label>
+                <input
+                  id="profile-email"
+                  type="email"
+                  className="form-control"
+                  placeholder={user?.email || 'Enter a new email'}
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  required
+                />
+                <button type="submit" className="profile-save-button" disabled={!email.trim() || pending === 'email'}>
+                  {pending === 'email' ? 'Saving…' : 'Save'}
+                </button>
+              </div>
+            </form>
+
+            <form className="profile-edit-form profile-password-form" onSubmit={handlePasswordChange}>
+              <div className="profile-form-copy">
+                <h3>Password</h3>
+                <p>Use your current password to choose a new one.</p>
+              </div>
+              <div className="profile-form-controls profile-password-controls">
+                <label className="visually-hidden" htmlFor="profile-old-password">Current password</label>
+                <input
+                  id="profile-old-password"
+                  type="password"
+                  className="form-control"
+                  placeholder="Current password"
+                  value={oldPassword}
+                  onChange={(event) => setOldPassword(event.target.value)}
+                  required
+                />
+                <label className="visually-hidden" htmlFor="profile-new-password">New password</label>
+                <input
+                  id="profile-new-password"
+                  type="password"
+                  className="form-control"
+                  placeholder="New password"
+                  value={newPassword}
+                  onChange={(event) => setNewPassword(event.target.value)}
+                  required
+                />
+                <button type="submit" className="profile-save-button" disabled={!oldPassword || !newPassword || pending === 'password'}>
+                  {pending === 'password' ? 'Updating…' : 'Update password'}
+                </button>
+              </div>
+            </form>
+          </section>
+        </div>
       </div>
     </main>
   );

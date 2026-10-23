@@ -33,7 +33,7 @@ const userReducer = (state = initialState, action) => {
     case UPDATE_USERNAME:
     case UPDATE_EMAIL:
     case UPDATE_PASSWORD:
-      return { ...state, user: { ...state.user, ...action.payload }, error: null };
+      return { ...state, user: { ...state.user, ...action.payload }, error: null, userError: null };
     case GET_ALL_USERS:
       return {
         ...state,
