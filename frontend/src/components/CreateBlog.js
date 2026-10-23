@@ -58,7 +58,6 @@ const CreateBlog = () => {
       const updatedCategories = isSelected
         ? prev.categories.filter((id) => String(id) !== String(categoryId))
         : [...prev.categories, String(categoryId)];
-      // console.log(updatedCategories)
       return { ...prev, categories: updatedCategories };
     });
   };

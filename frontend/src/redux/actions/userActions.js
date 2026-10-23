@@ -105,7 +105,6 @@ export const getAllUsers = (page, limit, searchQuery) => async (dispatch, getSta
         Authorization: `Bearer ${auth.accessToken}`,
       },
     });
-    // console.log(res.data)
     dispatch({ type: GET_ALL_USERS, payload: res.data });
   } catch (error) {
     dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to fetch users' });
@@ -212,7 +211,6 @@ export const getSavedBlogs = () => async (dispatch, getState) => {
         Authorization: `Bearer ${auth.accessToken}`,
       },
     });
-    // console.log(res.data)
 
     dispatch({ type: GET_SAVED_BLOGS, payload: res.data.savedBlogs });
     return Array.isArray(res.data.savedBlogs) ? res.data.savedBlogs : [];

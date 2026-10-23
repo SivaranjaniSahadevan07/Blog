@@ -21,19 +21,6 @@ const generateRefreshToken = (user) => {
   );
 };
 
-// Add token to blacklist
-// const blacklistToken = async (token, expirationTimeInSeconds) => {
-//   redisClient.set(token, 'revoked', 'EX', expirationTimeInSeconds, (err, reply) => {
-//     if (err) {
-//       console.error('Error adding token to blacklist:', err);
-//       return res.status(500).json({ message: 'Logout failed' });
-//     } else {
-//       console.log(`Token added to blacklist: ${token}`);
-//       res.status(200).json({ message: 'Logged out successfully' });
-//     }
-//   });
-// };
-
 exports.register = async (req, res) => {
   const { username, email, password } = req.body;
   // Check if a user with the same email already exists
@@ -110,57 +97,6 @@ exports.refreshToken = async (req, res) => {
   }
 };
 
-// Logout Function
-// exports.logout = async (req, res) => {
-//   const authHeader = req.headers.authorization;
-
-//   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-//     return res.status(401).json({ message: 'Unauthorized: No token provided' });
-//   }
-
-//   const token = authHeader.split(' ')[1];
-
-//   try {
-//     // Decode token to get expiry
-//     const decoded = jwt.decode(token);
-//     if (!decoded || !decoded.exp) {
-//       return res.status(400).json({ message: 'Invalid token' });
-//     }
-
-//     // Get the token's expiration time from the payload
-//     // const expirationTimeInSeconds = Math.floor(decoded.exp - Date.now() / 1000);
-
-//     // Calculate seconds until token expiry
-//     const now = Math.floor(Date.now() / 1000);
-//     const expiresIn = decoded.exp - now;
-//     if (expiresIn <= 0) {
-//       return res.status(400).json({ message: 'Token already expired' });
-//     }
-
-//     // Blacklist the token
-//     // await blacklistToken(token, expirationTimeInSeconds);
-
-//     // Store token in Redis with expiry
-//     // redisClient.set(token, 'revoked', 'EX', expiresIn, (err) => {
-//     //   if (err) {
-//     //     console.error('Error adding token to blacklist:', err);
-//     //     return res.status(500).json({ message: 'Logout failed' });
-//     //   }
-//     //   console.log(`Token added to blacklist: ${token}`);
-//     //   res.status(200).clearCookie("refreshToken").json({ message: 'Logged out successfully' });
-//     // })
-
-//     // Use Promise-based Redis API (no callback!)
-//     await redisClient.set(token, 'revoked', { EX: expiresIn });
-
-//     res.status(200).clearCookie("refreshToken").json({ message: 'Logged out successfully' });
-//     // res.status(200).clearCookie("refreshToken").json({ message: 'Logged out successfully' });
-//   } catch (error) {
-//     console.error('Error during logout:', error.message);
-//     res.status(500).json({ message: 'Failed to log out' });
-//   }
-// };
-
 exports.logout = async (req, res) => {
   const authHeader = req.headers.authorization;
 
@@ -182,7 +118,6 @@ exports.logout = async (req, res) => {
       return res.status(400).json({ message: 'Token already expired' });
     }
 
-    // Use Promise-based Redis API (no callback!)
     await redisClient.set(token, 'revoked', { EX: expiresIn });
 
     res.status(200).clearCookie("refreshToken").json({ message: 'Logged out successfully' });

@@ -5,14 +5,11 @@ import {getProfile} from './redux/actions/userActions';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
-// import Home from './pages/Home';
 import Blogs from './pages/Blogs';
 import BlogDetail from './pages/BlogDetail';
 import Profile from './pages/Profile';
-// import EditorDashboard from './pages/EditorDashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
-// import NotFound from './pages/NotFound';
 import Unauthorized from './pages/Unauthorized';
 import ProtectedRoute from './components/ProtectedRoute';
 import CreateBlog from "./components/CreateBlog";
@@ -23,8 +20,7 @@ import SavedBlogs from "./components/SavedBlogs";
 const App = () => {
 
   const dispatch = useDispatch();
-  const { isAuthenticated } = useSelector((state) => state.auth); // Access auth state
-  // console.log(isAuthenticated)
+  const { isAuthenticated } = useSelector((state) => state.auth);
 
   useEffect(() => {
     // Only refresh the access token if the user is authenticated
@@ -33,19 +29,6 @@ const App = () => {
       dispatch(getProfile());
     }
   }, [dispatch, isAuthenticated]);
-
-//   useEffect(() => {
-//   // Only refresh the access token if the user is authenticated and the token is about to expire
-//   if (isAuthenticated) {
-//     const tokenExpiry = localStorage.getItem('tokenExpiry'); // Assuming you store token expiry in localStorage
-//     const currentTime = Date.now();
-
-//     // Refresh the token only if it's close to expiring (e.g., within 5 minutes)
-//     if (tokenExpiry && currentTime > tokenExpiry - 5 * 60 * 1000) {
-//       dispatch(refreshAccessToken());
-//     }
-//   }
-// }, [dispatch, isAuthenticated]);
 
   return (
     <>
@@ -86,7 +69,6 @@ const App = () => {
         } />
 
         <Route path="/unauthorized" element={<Unauthorized />} />
-        {/* <Route path="*" element={<NotFound />} /> */}
       </Routes>
       <Footer />
     </>

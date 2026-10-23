@@ -1,21 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { redisClient } = require('../config/redis');
 
-// Check if a token is blacklisted
-// const isTokenBlacklisted = async (token) => {
-//   return new Promise((resolve, reject) => {
-//     redisClient.get(token, (err, reply) => {
-//       if (err) {
-//         // Consider blacklisted if Redis is down for security
-//          // Treat as blacklisted if Redis fails
-//         return resolve(true);
-//         // return reject(err);
-//       }
-//       resolve(reply === 'revoked'); // Check if token is blacklisted
-//     });
-//   });
-// };
-
 const isTokenBlacklisted = async (token) => {
   try {
     const reply = await redisClient.get(token);
@@ -50,13 +35,12 @@ const authenticate = async (req, res, next) => {
     next(); // Proceed to the next middleware
   } catch (error) {
     res.status(403).json({ message: 'Invalid Token' });
-    console.log(error.message)
+    console.error('Authentication error:', error.message);
   }
 };
 
 // Authorization Middleware
 const authorize = (roles) => (req, res, next) => {
-  // console.log(req.user)
   if (!req.user || !req.user.role) {
     return res.status(403).json({ message: 'Access Forbidden: User role not found : in authorize' });
   }

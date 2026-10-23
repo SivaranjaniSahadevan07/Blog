@@ -38,7 +38,6 @@ const addComment = async (req, res) => {
             author: req.user.id,
             blog: blogId
         });
-        // console.log(comment)
         await comment.save();
 
         // Populate the author field with the user's details
@@ -56,9 +55,6 @@ const deleteComment = async (req, res) => {
     const { reason } = req.body; // Reason for deletion
     const deletedById = req.user.id; // ID of the user performing the deletion
 
-    // console.log('Request Body:', req.body);
-    // console.log('Request User:', req.user);
-    // console.log(commentId, reason, deletedById);
 
     try {
         // Find the comment to delete

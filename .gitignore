@@ -1,2 +1,11 @@
-backend/node_modules/
-frontend/node_modules/
+node_modules/
+**/node_modules/
+
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+/frontend/build/
+/backend/uploads/
+.DS_Store

@@ -4,7 +4,7 @@ import { refreshAccessToken } from '../redux/actions/authActions';
 import { getAccessToken } from '../utils/tokenService';
 
 const instance = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8010/api", // or your backend URL
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
   withCredentials: true, // important: sends the refresh token cookie
 });
 

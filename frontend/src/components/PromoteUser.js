@@ -16,7 +16,6 @@ const PromoteUser = () => {
   const [page, setPage] = useState(1);
   const limit = 10; // Number of users per page
 
-  // console.log(users)
 
   useEffect(() => {
     dispatch(getAllUsers(page, limit, searchQuery));

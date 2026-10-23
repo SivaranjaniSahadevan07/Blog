@@ -22,11 +22,8 @@ export const login = (credentials) => async (dispatch) => {
     let res = await axios.post('/auth/login', credentials, { withCredentials: true });
     const { accessToken, user } = res.data;
     setAccessToken(accessToken);
-    // console.log(res)
-    // console.log(accessToken)
     dispatch({ type: LOGIN_SUCCESS, payload: { accessToken, user } });
   } catch (error) {
-    // console.log(error)
     dispatch({ type: AUTH_ERROR, payload: error.response?.data?.message });
   }
 };

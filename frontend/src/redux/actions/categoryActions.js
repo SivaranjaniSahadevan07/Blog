@@ -27,7 +27,6 @@ export const getAllCategories = () => async (dispatch) => {
 export const getSingleCategory = (categoryId) => async (dispatch) => {
   try {
     const res = await axios.get(`/categories/${categoryId}`);
-    //   console.log(res.data)
     dispatch({
       type: GET_SINGLE_CATEGORY,
       payload: res.data, // Contains the category details

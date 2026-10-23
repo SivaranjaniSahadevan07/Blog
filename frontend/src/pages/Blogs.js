@@ -53,7 +53,6 @@ const Blogs = () => {
     dispatch(getAllCategories());
   }, [dispatch, page, limit, filter, selectedCategory, searchQuery, isAuthenticated, user?.role]);
 
-  // console.log(blogs)
 
   // Handle pagination
   const handleNextPage = () => {

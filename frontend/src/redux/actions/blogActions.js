@@ -59,7 +59,6 @@ export const getBlogsByUser = (userId, page, limit) => async (dispatch) => {
   dispatch({ type: BLOGS_LOADING });
   try {
     const res = await axios.get(`/blogs/user/${userId}?page=${page}&limit=${limit}`);
-    // console.log(res.data)
     dispatch({ type: GET_BLOGS_BY_USER, payload: res.data });
   } catch (error) {
     dispatch({ type: BLOG_ERROR, payload: getBlogFetchError(error, 'Failed to fetch blogs by user') });
@@ -70,7 +69,6 @@ export const getBlogsByUser = (userId, page, limit) => async (dispatch) => {
 // export const getBlogsByCategory = (categoryId, page, limit) => async (dispatch) => {
 //   try {
 //     const res = await axios.get(`/blogs/category/${categoryId}?page=${page}&limit=${limit}`);
-//     // console.log(res.data)
 //     dispatch({ type: GET_BLOGS, payload: res.data });
 //   } catch (error) {
 //     dispatch({ type: BLOG_ERROR, payload: error.response?.data?.message || 'Failed to fetch blogs by category' });
@@ -98,7 +96,6 @@ export const getBlogComments = (blogId, page, limit) => async (dispatch, getStat
         Authorization: `Bearer ${auth.accessToken}`,
       },
     });
-    // console.log(res.data.comments)
     dispatch({
       type: GET_BLOG_COMMENTS,
       payload: res.data, // Contains the comments array
@@ -115,7 +112,6 @@ export const getBlogComments = (blogId, page, limit) => async (dispatch, getStat
 
 // Create a new blog
 export const createBlog = (blogData) => async (dispatch, getState) => {
-  // console.log(blogData)
   try {
     const { auth } = getState();
     const res = await axios.post('/blogs?uploadType=blog', blogData, {
@@ -220,10 +216,9 @@ export const getAdminBlogs = (page, limit) => async (dispatch) => {
   dispatch({ type: BLOGS_LOADING });
   try {
     const res = await axios.get(`/blogs/admin?page=${page}&limit=${limit}`);
-    // console.log(res.data)
     dispatch({ type: GET_BLOGS, payload: res.data });
   } catch (error) {
-    console.log(error)
+    console.error('Failed to fetch admin blogs:', error);
     dispatch({ type: BLOG_ERROR, payload: getBlogFetchError(error, 'Failed to fetch admin blogs') });
   }
 };

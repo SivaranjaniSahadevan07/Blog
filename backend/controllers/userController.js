@@ -153,7 +153,6 @@ const saveBlog = async (req, res) => {
         // Add the blog to the user's savedBlogs
         user.savedBlogs.push(blogId);
         await user.save();
-        // console.log(user.savedBlogs)
 
         res.status(200).json({ message: 'Blog saved successfully', savedBlogs: user.savedBlogs });
     } catch (error) {
@@ -221,7 +220,6 @@ const updateProfilePicture = async (req, res) => {
         const user = await User.findById(req.user.id);
         // Construct the public URL for the uploaded file
         const profileImageUrl = `${req.protocol}://${req.get('host')}/uploads/profile-pictures/${req.user.id}/${req.file.filename}`;
-        // console.log(profileImageUrl)
         // Save the public URL in the database
         user.profileImage = profileImageUrl;
         await user.save();

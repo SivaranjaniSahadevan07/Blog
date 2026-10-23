@@ -11,7 +11,6 @@ const getAllBlogs = async (req, res) => {
     const pageNumber = parseInt(page) || 1; // Default page to 1 if not provided
     const limitNumber = parseInt(limit) || 10; // Default limit to 10 if not provided
 
-    // console.log(limitNumber);
 
     // Fetch blogs with pagination
     const blogs = await Blog.find()
@@ -23,7 +22,6 @@ const getAllBlogs = async (req, res) => {
     // Get the total count of blogs
     const totalBlogs = await Blog.countDocuments();
 
-    // console.log(blogs)
 
     res.status(200).json({
       totalBlogs,
@@ -56,7 +54,6 @@ const getAllBlogs = async (req, res) => {
 
 const createNewBlog = async (req, res) => {
   let { title, content, categories } = req.body;
-  // console.log(categories)
 
   // Parse categories if it's a JSON string
   if (typeof categories === 'string') {
@@ -75,7 +72,6 @@ const createNewBlog = async (req, res) => {
     return res.status(400).json({ error: 'Categories must be an array' });
   }
 
-  // console.log("Categories:", categories);
 
   try {
     if (!req.file) {
@@ -143,7 +139,6 @@ const getSingleBlog = async (req, res) => {
     if (!blog) {
       return res.status(404).json({ error: 'Blog not found' });
     }
-    // console.log(blog)
     res.status(200).json(blog);
   } catch (error) {
     res.status(500).json({ error: 'Failed to retrieve blog by id' });
@@ -172,7 +167,6 @@ const getSingleBlog = async (req, res) => {
 
 // const getBlogComments = async (req, res) => {
 //   const { blogId } = req.params;
-//   // console.log("User:", req.user);
 
 //   try {
 //     // Fetch all comments for the blog
@@ -180,7 +174,6 @@ const getSingleBlog = async (req, res) => {
 
 //     // If the user is not authenticated, return all comments as is
 //     if (!req.user || !req.user.id) {
-//       // console.log("no token comments")
 //       return res.status(200).json(comments);
 //     }
 
@@ -209,7 +202,6 @@ const getSingleBlog = async (req, res) => {
 
 const getBlogComments = async (req, res) => {
   const { blogId } = req.params;
-  // console.log("User:", req.user);
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
@@ -226,7 +218,6 @@ const getBlogComments = async (req, res) => {
 
     // If the user is not authenticated, return all comments as is
     if (!req.user || !req.user.id) {
-      // console.log("no token comments")
       return res.status(200).json(comments);
     }
 
@@ -443,7 +434,6 @@ const getBlogsByCategory = async (req, res) => {
       .limit(parseInt(limit))
       .sort({ createdAt: -1 }); // Sort by newest first
 
-    // console.log(blogs)
 
     const totalBlogs = await Blog.countDocuments({ categories: categoryId });
 

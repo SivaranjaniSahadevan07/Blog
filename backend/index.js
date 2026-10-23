@@ -64,7 +64,7 @@ const startServer = async () => {
 
     app.listen(PORT, () => {
         const serverURL = `${PROTOCOL}://${HOST}:${PORT}`
-        console.log("Server running at " + serverURL)
+        console.info('Server running at ' + serverURL);
     })
 }
 

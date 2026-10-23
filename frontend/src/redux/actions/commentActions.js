@@ -19,7 +19,6 @@ export const addComment = (blogId, commentData) => async (dispatch, getState) =>
         Authorization: `Bearer ${auth.accessToken}`,
       },
     });
-    // console.log(res.data.comment)
     dispatch({
       type: ADD_COMMENT,
       payload: res.data.comment, // Contains the added comment
