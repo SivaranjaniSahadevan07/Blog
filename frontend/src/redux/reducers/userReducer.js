@@ -68,7 +68,9 @@ const userReducer = (state = initialState, action) => {
     case SAVE_BLOG:
       return {
         ...state,
-        savedBlogs: [...state.savedBlogs, action.payload],
+        savedBlogs: state.savedBlogs.some((blog) => blog._id === action.payload._id)
+          ? state.savedBlogs
+          : [...state.savedBlogs, action.payload],
         userError: null,
       };
     case GET_SAVED_BLOGS:

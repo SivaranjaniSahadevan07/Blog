@@ -5,12 +5,14 @@ import { useParams } from 'react-router-dom';
 import Comments from '../components/Comments';
 import CommentForm from '../components/CommentForm';
 import BlogsLikesDislikes from '../components/BlogsLikesDislikes';
+import { getSavedBlogs, removeSavedBlog, saveBlog } from '../redux/actions/userActions';
 
 const BlogDetail = () => {
   const { blogId } = useParams();
   const dispatch = useDispatch();
   const { isAuthenticated, user } = useSelector((state) => state.auth);
   const { comments } = useSelector((state) => state.blogs);
+  const { savedBlogs } = useSelector((state) => state.users);
 
   const [hasCommented, setHasCommented] = useState(false);
   const [serverWaking, setServerWaking] = useState(false);
@@ -18,6 +20,8 @@ const BlogDetail = () => {
   const [storyLoading, setStoryLoading] = useState(true);
   const [storyError, setStoryError] = useState(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [savingStory, setSavingStory] = useState(false);
+  const [saveError, setSaveError] = useState('');
 
   useEffect(() => {
     let isCurrentRequest = true;
@@ -40,6 +44,12 @@ const BlogDetail = () => {
   }, [dispatch, blogId, retryCount]);
 
   useEffect(() => {
+    if (isAuthenticated && user?.role === 'reader') {
+      dispatch(getSavedBlogs());
+    }
+  }, [dispatch, blogId, isAuthenticated, user?.role]);
+
+  useEffect(() => {
     if (!storyLoading) {
       setServerWaking(false);
       return undefined;
@@ -56,6 +66,22 @@ const BlogDetail = () => {
       setHasCommented(!!userComment); // Set to true if the user has commented
     }
   }, [comments, user]);
+
+  const isStorySaved = Array.isArray(savedBlogs) &&
+    savedBlogs.some((savedBlog) => String(savedBlog?._id || savedBlog) === String(blogId));
+
+  const handleSaveToggle = async () => {
+    if (!blog || savingStory) return;
+    setSavingStory(true);
+    setSaveError('');
+    const result = isStorySaved
+      ? await dispatch(removeSavedBlog(blogId))
+      : await dispatch(saveBlog(blogId, blog));
+    if (!result?.success) {
+      setSaveError(result?.error || 'Could not update your reading list. Please try again.');
+    }
+    setSavingStory(false);
+  };
 
   return (
     <main className="blog-detail-page">
@@ -79,6 +105,21 @@ const BlogDetail = () => {
               By <i>{blog.author?.username || "Unknown author"}</i>
               {blog.createdAt && ` · ${blog.createdAt.split("T")[0].split("-").reverse().join("-")}`}
             </p>
+            {isAuthenticated && user?.role === 'reader' && (
+              <div className="story-save-detail">
+                <button
+                  className={`story-save-detail-button ${isStorySaved ? 'is-saved' : ''}`}
+                  type="button"
+                  onClick={handleSaveToggle}
+                  disabled={savingStory}
+                  aria-pressed={isStorySaved}
+                >
+                  <span aria-hidden="true">{isStorySaved ? '✓' : '♡'}</span>
+                  {savingStory ? 'Updating…' : isStorySaved ? 'Saved to your reading list' : 'Save for later'}
+                </button>
+                {saveError && <span className="story-save-detail-error" role="alert">{saveError}</span>}
+              </div>
+            )}
             <BlogsLikesDislikes blog={blog} />
             {blog.categories?.length > 0 && (
               <p className="blog-categories">Topics: {blog.categories.map((cat) => <span key={cat._id}>{cat.name} </span>)}</p>

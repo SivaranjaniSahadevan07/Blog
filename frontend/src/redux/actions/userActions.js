@@ -186,18 +186,20 @@ export const blockUnblockUser = (userId, isBlocked) => async (dispatch, getState
 };
 
 // Save a blog (Reader only)
-export const saveBlog = (blogId) => async (dispatch, getState) => {
+export const saveBlog = (blogId, blog) => async (dispatch, getState) => {
   try {
     const { auth } = getState();
-    const res = await axios.post('/users/save-blog', { blogId }, {
+    await axios.post('/users/save-blog', { blogId }, {
       headers: {
         Authorization: `Bearer ${auth.accessToken}`,
       },
     });
-    // console.log(res.data)
-    dispatch({ type: SAVE_BLOG, payload: res.data });
+    if (blog) dispatch({ type: SAVE_BLOG, payload: blog });
+    return { success: true };
   } catch (error) {
-    dispatch({ type: USER_ERROR, payload: error.response?.data?.message || 'Failed to save blog' });
+    const message = error.response?.data?.message || 'Failed to save blog';
+    dispatch({ type: USER_ERROR, payload: message });
+    return { success: false, error: message };
   }
 };
 
