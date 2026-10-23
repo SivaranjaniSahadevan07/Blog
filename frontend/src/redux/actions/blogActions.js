@@ -103,11 +103,13 @@ export const getBlogComments = (blogId, page, limit) => async (dispatch, getStat
       type: GET_BLOG_COMMENTS,
       payload: res.data, // Contains the comments array
     });
+    return res.data;
   } catch (error) {
     dispatch({
       type: BLOG_ERROR,
       payload: error.response?.data?.message || 'Error fetching blog comments',
     });
+    return null;
   }
 };
 
@@ -202,11 +204,14 @@ export const likeDislikeBlog = (blogId, actionType) => async (dispatch, getState
         dislikes: res.data.dislikes,
       },
     });
+    return res.data;
   } catch (error) {
+    const message = error.response?.data?.message || error.response?.data?.error || 'Error liking/disliking blog';
     dispatch({
       type: BLOG_ERROR,
-      payload: error.response?.data?.message || 'Error liking/disliking blog',
+      payload: message,
     });
+    throw new Error(message);
   }
 };
 

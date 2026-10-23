@@ -1,63 +1,70 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/actions/authActions";
 
 const Navbar = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const [menuOpen, setMenuOpen] = useState(false);
   const { isAuthenticated, user: authUser } = useSelector((state) => state.auth);
   const { user: profileUser } = useSelector((state) => state.users);
 
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
+
+  const closeMenu = () => setMenuOpen(false);
   const handleLogout = () => {
     dispatch(logout());
+    closeMenu();
     navigate("/");
   };
 
   return (
     <nav className="navbar navbar-expand-lg navbar-light">
       <div className="container-fluid p-0">
-        <Link className="navbar-brand" to="/">MyBlogApp</Link>
+        <Link className="navbar-brand" to="/" onClick={closeMenu}>MyBlogApp</Link>
         <button
-          className="navbar-toggler"
+          className={`navbar-toggler ${menuOpen ? "is-open" : ""}`}
           type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
           aria-controls="navbarNav"
-          aria-expanded="false"
+          aria-expanded={menuOpen}
           aria-label="Toggle navigation"
+          onClick={() => setMenuOpen((open) => !open)}
         >
-          <span className="navbar-toggler-icon"></span>
+          <span className="navbar-toggle-lines" aria-hidden="true"><span /><span /><span /></span>
         </button>
-        <div className="collapse navbar-collapse" id="navbarNav">
+        <div className={`navbar-collapse ${menuOpen ? "show" : ""}`} id="navbarNav">
           <ul className="navbar-nav">
             <li className="nav-item">
-              <Link className="nav-link" to="/">Blogs</Link>
+              <Link className="nav-link" to="/" onClick={closeMenu}>Blogs</Link>
             </li>
             {isAuthenticated && (
               <>
                 {["admin", "editor", "reader"].includes(authUser?.role) && (
                   <li className="nav-item">
-                    <Link className="nav-link" to="/profile">Profile</Link>
+                    <Link className="nav-link" to="/profile" onClick={closeMenu}>Profile</Link>
                   </li>
                 )}
                 {["admin", "editor"].includes(authUser?.role) && (
                   <li className="nav-item">
-                    <Link className="nav-link" to="/create-blog">Blog +</Link>
+                    <Link className="nav-link" to="/create-blog" onClick={closeMenu}>Blog +</Link>
                   </li>
                 )}
                 {authUser?.role === "reader" && (
                   <li className="nav-item">
-                    <Link className="nav-link" to="/saved-blogs">Saved Blogs</Link>
+                    <Link className="nav-link" to="/saved-blogs" onClick={closeMenu}>Saved Blogs</Link>
                   </li>
                 )}
                 {authUser?.role === "admin" && (
                   <>
                     <li className="nav-item">
-                      <Link className="nav-link" to="/create-category">Category +</Link>
+                      <Link className="nav-link" to="/create-category" onClick={closeMenu}>Category +</Link>
                     </li>
                     <li className="nav-item">
-                      <Link className="nav-link" to="/promote-user">Promote</Link>
+                      <Link className="nav-link" to="/promote-user" onClick={closeMenu}>Promote</Link>
                     </li>
                   </>
                 )}
@@ -88,10 +95,10 @@ const Navbar = () => {
             ) : (
               <>
                 <li className="nav-item">
-                  <Link className="btn btn-outline-light" to="/login">Login</Link>
+                  <Link className="btn btn-outline-light" to="/login" onClick={closeMenu}>Login</Link>
                 </li>
                 <li className="nav-item">
-                  <Link className="btn btn-light" to="/register">Register</Link>
+                  <Link className="btn btn-light" to="/register" onClick={closeMenu}>Register</Link>
                 </li>
               </>
             )}

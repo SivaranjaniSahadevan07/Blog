@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { getSingleBlog, getBlogComments } from '../redux/actions/blogActions';
+import { getSingleBlog } from '../redux/actions/blogActions';
 import { useParams } from 'react-router-dom';
 import Comments from '../components/Comments';
 import CommentForm from '../components/CommentForm';
@@ -34,7 +34,6 @@ const BlogDetail = () => {
       .finally(() => {
         if (isCurrentRequest) setStoryLoading(false);
       });
-    dispatch(getBlogComments(blogId)); // Fetch comments for the blog
     return () => {
       isCurrentRequest = false;
     };
@@ -80,7 +79,7 @@ const BlogDetail = () => {
               By <i>{blog.author?.username || "Unknown author"}</i>
               {blog.createdAt && ` · ${blog.createdAt.split("T")[0].split("-").reverse().join("-")}`}
             </p>
-            <BlogsLikesDislikes blogId={blogId} />
+            <BlogsLikesDislikes blog={blog} />
             {blog.categories?.length > 0 && (
               <p className="blog-categories">Topics: {blog.categories.map((cat) => <span key={cat._id}>{cat.name} </span>)}</p>
             )}

@@ -24,11 +24,13 @@ export const addComment = (blogId, commentData) => async (dispatch, getState) =>
       type: ADD_COMMENT,
       payload: res.data.comment, // Contains the added comment
     });
+    return res.data.comment;
   } catch (error) {
     dispatch({
       type: COMMENT_ERROR,
       payload: error.response?.data?.message || 'Error adding comment',
     });
+    return null;
   }
 };
 

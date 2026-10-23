@@ -114,6 +114,13 @@ const blogReducer = (state = initialState, action) => {
     case LIKE_DISLIKE_BLOG:
       return {
         ...state,
+        blog: state.blog?._id === action.payload.blogId
+          ? {
+            ...state.blog,
+            likes: action.payload.likes,
+            dislikes: action.payload.dislikes,
+          }
+          : state.blog,
         blogs: state.blogs.map((blog) =>
           blog._id === action.payload.blogId
             ? {
