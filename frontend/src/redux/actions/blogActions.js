@@ -115,19 +115,24 @@ export const createBlog = (blogData) => async (dispatch, getState) => {
     const res = await axios.post('/blogs?uploadType=blog', blogData, {
       headers: {
         Authorization: `Bearer ${auth.accessToken}`,
-        'Content-Type': 'multipart/form-data', // Ensure the correct content type
-        'x-upload-type': 'blog', // Optional: Send as a custom header
       },
     });
     dispatch({
       type: CREATE_BLOG,
-      payload: res.data, // Contains the created blog
+      payload: res.data,
     });
+    return res.data;
   } catch (error) {
+    const message = error.response?.data?.message ||
+      error.response?.data?.error ||
+      (error.request
+        ? 'Could not reach the blog server. Check your connection and try again.'
+        : 'Error creating blog');
     dispatch({
       type: BLOG_ERROR,
-      payload: error.response?.data?.message || 'Error creating blog',
+      payload: message,
     });
+    throw new Error(message);
   }
 };
 

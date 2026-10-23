@@ -88,11 +88,21 @@ a {
 }
 
 .navbar .navbar-toggler {
-  border-color: var(--line);
+  padding: 0.45rem 0.6rem;
+  border: 2px solid var(--green);
+  border-radius: 0.6rem;
+  background-color: #edf4ef;
+}
+
+.navbar .navbar-toggler:hover,
+.navbar .navbar-toggler:focus {
+  border-color: var(--green-dark);
+  background-color: #e2eee5;
+  box-shadow: 0 0 0 0.15rem rgba(49, 91, 67, 0.18);
 }
 
 .navbar .navbar-toggler-icon {
-  filter: invert(1);
+  filter: brightness(0) saturate(100%) invert(29%) sepia(17%) saturate(1153%) hue-rotate(91deg) brightness(95%) contrast(88%);
 }
 
 .navbar .btn {
